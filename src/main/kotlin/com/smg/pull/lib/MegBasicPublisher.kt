@@ -35,10 +35,16 @@ open class MegBasicPublisher(
             )
         )
 
-    protected fun publishMessageFromConfig(
-        sourceMessageId: String,
+    /**
+     * Resuelve del [MegPublishConfig] prefix solo topic id, version y publish token.
+     * Metadatos de publish (idempotencyKey, eventType, sourceApp, user, etc.) los define el caller.
+     */
+    protected fun publishUsingTopicConfig(
+        idempotencyKey: String,
         correlationId: String,
         user: String,
+        eventType: String,
+        sourceApp: String,
         payload: Any,
         eventVersion: Int = 1
     ): Map<String, Any> {
@@ -49,8 +55,6 @@ open class MegBasicPublisher(
         val topicVersion = requiredProperty(env, "$prefix.version").toIntOrNull()
             ?: throw IllegalArgumentException("Invalid version for @MegPublishConfig prefix '$prefix'")
         val topicToken = requiredProperty(env, "$prefix.token")
-        val eventType = requiredProperty(env, "$prefix.event-type")
-        val sourceApp = requiredProperty(env, "sample.source-app")
 
         return publishMessage(
             topicId = topicId,
@@ -59,7 +63,7 @@ open class MegBasicPublisher(
             user = user,
             eventType = eventType,
             payload = payload,
-            idempotencyKey = "$sourceMessageId-large-route",
+            idempotencyKey = idempotencyKey,
             correlationId = correlationId,
             sourceApp = sourceApp,
             eventVersion = eventVersion
@@ -69,7 +73,7 @@ open class MegBasicPublisher(
     private fun resolvePublishPrefix(): String {
         val ann = this::class.java.getAnnotation(MegPublishConfig::class.java)
             ?: throw IllegalStateException(
-                "Publisher ${this::class.java.simpleName} must define @MegPublishConfig to use publishMessageFromConfig"
+                "Publisher ${this::class.java.simpleName} must define @MegPublishConfig to use publishUsingTopicConfig"
             )
         return ann.configPrefix
     }
