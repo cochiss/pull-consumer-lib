@@ -84,7 +84,7 @@ Map<String, Object> response = megPullClient.publish("solicitudes-reintegros", 1
 
 - `MegBasicPullConsumer<T : MegMessage>`: base genérica con helpers (`ackProcessed`, `ackReject`) y template de procesamiento por batch.
 - `MegBasicPublisher`: helper para publicar con `MegPullClient` construyendo metadata/request de forma consistente.
-- `@MegPublishConfig(configPrefix)`: permite resolver config de publish una sola vez por clase (`id`, `version`, `token`, `event-type`) y usar `publishMessageFromConfig(...)`.
+- `@MegPublishConfig(configPrefix)`: resuelve del YAML solo `id`, `version` y `token` del topic de salida; el caller pasa `publishUsingTopicConfig(...)` con `idempotencyKey`, `eventType`, `sourceApp`, `user`, etc. explícitos.
 - `MegMessage` + `MegMessageMapper<T>`: patrón para mapear `Map<String, Object>` a modelos tipados por dominio (solo mapping).
 - `MegValidationResult`: resultado estándar de validación (`valid` + `message` nullable) para validaciones en el consumer.
 - `MegSubscriptionConfigs.from(MegInboundSubscriptionBinding)`: una sola línea para armar `MegSubscriptionConfig` desde tu `@ConfigurationProperties` (implementá el binding en tu clase de topic inbound).
@@ -121,11 +121,13 @@ public class PullReintegrosStandardConsumer extends MegBasicPullConsumer<Reinteg
     public void onPullMessage(List<Map<String, Object>> messages) {
         processMessagesForSubscription((List<Map<String, Object>>) (List<?>) messages, subscriptionConfig, message -> {
             if (message.getMonto() > 10000) {
-                publisher.publishMessage(
-                    message.getMessageId(),
+                publisher.publish(
+                    "alto-monto-route-" + message.getMessageId(),
                     message.getCorrelationId(),
-                    message.getUser(),
-                    (Map<String, Object>) (Map<?, ?>) message.getPayload()
+                    "finanzas-api",
+                    "solicitud.reintegro.alto-monto.detectada",
+                    "sample-consumer",
+                    message.getPayload()
                 );
             }
         });
@@ -147,7 +149,7 @@ public class PullReintegrosStandardConsumer extends MegBasicPullConsumer<Reinteg
 }
 ```
 
-Publisher (anotación en clase + `publishMessageFromConfig(...)`):
+Publisher (anotación en clase + `publishUsingTopicConfig(...)` con metadatos explícitos):
 
 ```java
 @Component
@@ -157,13 +159,15 @@ public class ReintegrosLargePublisher extends MegBasicPublisher {
         super(megPullClient, environment);
     }
 
-    public Map<String, Object> publishMessage(
-            String sourceMessageId,
+    public Map<String, Object> publish(
+            String idempotencyKey,
             String correlationId,
             String user,
+            String eventType,
+            String sourceApp,
             Map<String, Object> payload
     ) {
-        return super.publishMessageFromConfig(sourceMessageId, correlationId, user, payload, 1);
+        return super.publishUsingTopicConfig(idempotencyKey, correlationId, user, eventType, sourceApp, payload, 1);
     }
 }
 ```

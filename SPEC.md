@@ -12,8 +12,8 @@ Ofrecer consumo **PULL** declarativo y publicación de mensajes contra la API RE
 - `MegPublishMetadata`: `idempotencyKey`, `topicToken`, `correlationId`, `sourceApp`
 - `MegPublishMessageRequest`: `user`, `eventType`, `eventVersion`, `payload`
 - `MegBasicPullConsumer<T : MegMessage>`: base genérica para procesamiento por batch + ACK/REJECT por ítem
-- `MegBasicPublisher`: base para encapsular publicación estándar
-- `@MegPublishConfig(configPrefix)`: configuración declarativa de publicación por clase
+- `MegBasicPublisher`: base para encapsular publicación estándar (`publishMessage`, `publishUsingTopicConfig`)
+- `@MegPublishConfig(configPrefix)`: resuelve del prefix solo `id`, `version`, `token`; `eventType`, `sourceApp`, `idempotencyKey` y `user` los define el caller en cada publish
 - `MegMessage` (model base) + `MegMessageMapper<T>` para transformación tipada de mensajes
 - `MegValidationResult`: resultado estándar de validación (`valid`, `message?`) para validación de negocio en consumers
 - `MegSubscriptionConfig`: `topicId`, `version`, `nameSub`, `token`, `subscriptionId`
@@ -41,6 +41,7 @@ La aplicación usa el contrato del gateway (ver SPEC del gateway). Con `MegBasic
 - Handler: vacío o un `List<Map<String, Object>>`.
 - Modo recomendado: `configPrefix` en la **clase** del consumer y handler `onPullMessage` (o `handlerMethod` explícito).
 - El adapter/mapping (`mapMessage`) transforma raw `Map<String, Any>` a mensaje tipado de dominio; la validación de rechazo de negocio queda en el consumer (`validateMappedMessage`), no en el mapper.
+- **Efectos de negocio** (pagos, DB, APIs externas): convención recomendada en la app consumidora — mantener la subclase de `MegBasicPullConsumer` delgada y delegar en un servicio de dominio (por ejemplo `reintegrosPagoService.pagar(reintegro)` tras validación OK), no acoplar esa lógica al adapter del mensaje.
 - Suscripción para ACK: construir `MegSubscriptionConfig` con `MegSubscriptionConfigs.from(...)`; el modelo de config de la app puede implementar `MegInboundSubscriptionBinding`.
 
 ## Niveles de log (estándar)
