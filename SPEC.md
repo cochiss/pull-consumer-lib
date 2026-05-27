@@ -4,6 +4,8 @@
 
 Ofrecer consumo **PULL** declarativo y publicación de mensajes contra la API REST del Messaging Event Gateway documentada en **[`../messaging-event-gateway/SPEC.md`](../messaging-event-gateway/SPEC.md)**.
 
+Guía ARQEVENT (integración y uso de esta lib): [messaging-event-gateway/docs/arqevent/03-guia-libreria-pull-consumer-lib.md](https://github.com/cochiss/messaging-event-gateway/blob/main/docs/arqevent/03-guia-libreria-pull-consumer-lib.md) (índice: [README](https://github.com/cochiss/messaging-event-gateway/blob/main/docs/arqevent/README.md)).
+
 **Flujo Git:** todo cambio en este repo va en rama (`feat/...`, `fix/...`) desde `main` actualizado; ver **[SPEC del workspace §6](../SPEC.md#6-flujo-git-obligatorio)**.
 
 ## API pública

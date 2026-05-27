@@ -6,6 +6,8 @@ Con `MegBasicPullConsumer<T>`, el ACK se resuelve por mensaje: falla de `mapMess
 
 Documentación técnica: **[`SPEC.md`](SPEC.md)**.
 
+Guía de integración MEG (ARQEVENT): índice en el repo del gateway — [docs/arqevent/README.md](https://github.com/cochiss/messaging-event-gateway/blob/main/docs/arqevent/README.md); capítulo de esta librería — [03-guia-libreria-pull-consumer-lib.md](https://github.com/cochiss/messaging-event-gateway/blob/main/docs/arqevent/03-guia-libreria-pull-consumer-lib.md).
+
 ## Maven
 
 Coordenada:
