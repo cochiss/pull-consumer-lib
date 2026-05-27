@@ -4,6 +4,8 @@
 
 Ofrecer consumo **PULL** declarativo y publicación de mensajes contra la API REST del Messaging Event Gateway documentada en **[`../messaging-event-gateway/SPEC.md`](../messaging-event-gateway/SPEC.md)**.
 
+**Flujo Git:** todo cambio en este repo va en rama (`feat/...`, `fix/...`) desde `main` actualizado; ver **[SPEC del workspace §6](../SPEC.md#6-flujo-git-obligatorio)**.
+
 ## API pública
 
 - `@MegPullSubscription(configPrefix | topicId, version, nameSub, token, rows, cron, handlerMethod)` en **clase** (recomendado) o en **método**
